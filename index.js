@@ -1,33 +1,36 @@
 const express = require('express');
-const { faker } = require('@faker-js/faker');
+const cors = require('cors');
+const routerApi = require('./routes');
+
+const {
+  logErrors,
+  errorHandler,
+  boomErrorHandler,
+} = require('./middlewares/error.handler');
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
-app.get('/', (req, res) => {
-  res.send('Hola mundo desde mi server en express')
-})
+app.use(express.json());
 
-app.get('/products', (req, res) => {
-  const products = []
-  for (let i = 0; i<100;i++) {
-    products.push({
-      id: i,
-      nombre: faker.commerce.productName(),
-      price: Number(faker.commerce.price()),
-      image: faker.image.url()
-    })
-  }
-  res.json(products)
-})
+const whitelist = ['http://localhost:8080', 'https://myapp.co'];
+const options = {
+  origin: (origin, callback) => {
+    if (whitelist.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('no permitido'));
+    }
+  },
+};
+app.use(cors(options));
 
-app.get('/products/:id', (req, res) => {
-  const {id} = req.params
-  const result = products.filter(item => item.id == id)
-  console.log(id, result)
-  res.json(result);
-})
+routerApi(app);
 
-app.listen(port,()=>{
-  console.log('Puerto: '+ port)
-})
+app.use(logErrors);
+app.use(boomErrorHandler);
+app.use(errorHandler);
+
+app.listen(port, () => {
+  console.log('Puerto: ' + port);
+});
