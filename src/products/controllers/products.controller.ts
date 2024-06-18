@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Query,
   Param,
   Post,
   Body,
@@ -15,17 +14,20 @@ import { ParseIntPipe } from '../../common/parse-int.pipe';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
 
 import { ProductsService } from './../services/products.service';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
-  getProducts(
+  @ApiOperation({ summary: 'List of products' })
+  /*
     @Query('limit') limit = 100,
     @Query('offset') offset = 0,
     @Query('brand') brand: string,
-  ) {
+  */
+  getProducts() {
     return this.productsService.findAll();
   }
 
