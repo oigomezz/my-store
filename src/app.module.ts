@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
-import { lastValueFrom } from 'rxjs';
 import * as Joi from 'joi';
 
 import { AppController } from './app.controller';
@@ -30,6 +29,8 @@ import config from './config';
     DatabaseModule,
   ],
   controllers: [AppController],
+  providers: [AppService],
+  /*
   providers: [
     AppService,
     {
@@ -42,5 +43,6 @@ import config from './config';
       inject: [HttpService],
     },
   ],
+  */
 })
 export class AppModule {}
