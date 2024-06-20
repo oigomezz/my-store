@@ -2,25 +2,12 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { Client } from 'pg';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { ProductsModule } from './products/products.module';
 import { DatabaseModule } from './database/database.module';
 import { enviroments } from './enviroments';
 import config from './config';
-
-const client = new Client({
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  port: parseInt(process.env.POSTGRES_PORT, 10),
-});
-
-client.connect();
 
 @Module({
   imports: [
@@ -38,8 +25,6 @@ client.connect();
       }),
     }),
     HttpModule,
-    UsersModule,
-    ProductsModule,
     DatabaseModule,
   ],
   controllers: [AppController],

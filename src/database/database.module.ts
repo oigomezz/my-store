@@ -1,26 +1,11 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { MongoClient } from 'mongodb';
+import { Client } from 'pg';
 
 import config from '../config';
+
 @Global()
 @Module({
-  imports: [
-    MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigType<typeof config>) => {
-        const { connection, user, password, host, port, dbName } =
-          configService.mongo;
-        return {
-          uri: `${connection}://${host}:${port}`,
-          user,
-          pass: password,
-          dbName,
-        };
-      },
-      inject: [config.KEY],
-    }),
-  ],
   providers: [
     {
       provide: 'API_KEY',
@@ -30,19 +15,22 @@ import config from '../config';
           : process.env.API_KEY,
     },
     {
-      provide: 'MONGO',
-      useFactory: async (configService: ConfigType<typeof config>) => {
-        const { connection, user, password, host, port, dbName } =
-          configService.mongo;
-        const uri = `${connection}://${user}:${password}@${host}:${port}/?authSource=admin&readPreference=primary`;
-        const client = new MongoClient(uri);
-        await client.connect();
-        const database = client.db(dbName);
-        return database;
+      provide: 'PG',
+      useFactory: (configService: ConfigType<typeof config>) => {
+        const { user, host, database, password, port } = configService.postgres;
+        const client = new Client({
+          user,
+          host,
+          database,
+          password,
+          port,
+        });
+        client.connect();
+        return client;
       },
       inject: [config.KEY],
     },
   ],
-  exports: ['API_KEY', 'MONGO', MongooseModule],
+  exports: ['API_KEY', 'PG'],
 })
 export class DatabaseModule {}
