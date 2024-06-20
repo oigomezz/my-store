@@ -1,37 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
 
-import { Customer } from '../entities/customer.entity';
+import { CustomersService } from '../services/customers.service';
 import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dto';
 
-@Injectable()
-export class CustomersService {
-  constructor(
-    @InjectModel(Customer.name) private customerModel: Model<Customer>,
-  ) {}
+@Controller('customers')
+export class CustomerController {
+  constructor(private customersService: CustomersService) {}
 
+  @Get()
   findAll() {
-    return this.customerModel.find().exec();
+    return this.customersService.findAll();
   }
 
-  async findOne(id: string) {
-    return this.customerModel.findById(id);
+  @Get(':id')
+  get(@Param('id') id: string) {
+    return this.customersService.findOne(id);
   }
 
-  create(data: CreateCustomerDto) {
-    console.log(data);
-    const newModel = new this.customerModel(data);
-    return newModel.save();
+  @Post()
+  create(@Body() payload: CreateCustomerDto) {
+    return this.customersService.create(payload);
   }
 
-  update(id: string, changes: UpdateCustomerDto) {
-    return this.customerModel
-      .findByIdAndUpdate(id, { $set: changes }, { new: true })
-      .exec();
+  @Put(':id')
+  update(@Param('id') id: string, @Body() payload: UpdateCustomerDto) {
+    return this.customersService.update(id, payload);
   }
 
-  remove(id: string) {
-    return this.customerModel.findByIdAndDelete(id);
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.customersService.remove(id);
   }
 }

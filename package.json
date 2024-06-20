@@ -2,7 +2,7 @@
   "name": "my-store",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "oigomezz",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -34,7 +34,8 @@
     "mongoose": "^8.4.3",
     "reflect-metadata": "^0.2.0",
     "rimraf": "^5.0.7",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

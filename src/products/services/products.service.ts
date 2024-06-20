@@ -18,11 +18,10 @@ export class ProductsService {
   findAll(params?: FilterProductsDto) {
     if (params) {
       const filters: FilterQuery<Product> = {};
-      const { limit, offset } = params;
-      const { minPrice, maxPrice } = params;
-      if (minPrice && maxPrice) {
+      const { limit, offset, minPrice, maxPrice } = params;
+      if (minPrice && maxPrice)
         filters.price = { $gte: minPrice, $lte: maxPrice };
-      }
+
       return this.productModel
         .find(filters)
         .populate('brand')
@@ -35,9 +34,7 @@ export class ProductsService {
 
   async findOne(id: string) {
     const product = await this.productModel.findById(id).exec();
-    if (!product) {
-      throw new NotFoundException(`Product #${id} not found`);
-    }
+    if (!product) throw new NotFoundException(`Product #${id} not found`);
     return product;
   }
 
@@ -50,9 +47,7 @@ export class ProductsService {
     const product = this.productModel
       .findByIdAndUpdate(id, { $set: changes }, { new: true })
       .exec();
-    if (!product) {
-      throw new NotFoundException(`Product #${id} not found`);
-    }
+    if (!product) throw new NotFoundException(`Product #${id} not found`);
     return product;
   }
 

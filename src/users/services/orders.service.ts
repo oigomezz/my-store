@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 import { Order } from '../entities/order.entity';
 import { CreateOrderDto, UpdateOrderDto } from '../dtos/order.dto';
@@ -18,7 +18,9 @@ export class OrdersService {
   }
 
   async findOne(id: string) {
-    return this.orderModel.findById(id);
+    const order = await this.orderModel.findById(id);
+    if (!order) throw new NotFoundException(`Order #${id} not found`);
+    return order;
   }
 
   create(data: CreateOrderDto) {
@@ -27,9 +29,11 @@ export class OrdersService {
   }
 
   update(id: string, changes: UpdateOrderDto) {
-    return this.orderModel
+    const order = this.orderModel
       .findByIdAndUpdate(id, { $set: changes }, { new: true })
       .exec();
+    if (!order) throw new NotFoundException(`Order #${id} not found`);
+    return order;
   }
 
   remove(id: string) {

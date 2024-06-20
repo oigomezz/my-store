@@ -1,55 +1,57 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Db } from 'mongodb';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { User } from '../entities/user.entity';
+import { UsersService } from '../services/users.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
-import { ProductsService } from '../../products/services/products.service';
 
-@Injectable()
-export class UsersService {
-  constructor(
-    private productsService: ProductsService,
-    @Inject('MONGO') private databaseMongo: Db,
-    @InjectModel(User.name) private userModel: Model<User>,
-  ) {}
+@ApiTags('users')
+@Controller('users')
+export class UsersController {
+  constructor(private usersService: UsersService) {}
 
+  @Get()
+  @ApiOperation({
+    summary: 'List of users',
+  })
   findAll() {
-    return this.userModel.find().exec();
+    return this.usersService.findAll();
   }
 
-  getTasks() {
-    const tasksCollection = this.databaseMongo.collection('tasks');
-    return tasksCollection.find().toArray();
+  @Get('tasks')
+  tasks() {
+    return this.usersService.getTasks();
   }
 
-  async findOne(id: string) {
-    return this.userModel.findById(id);
+  @Get(':id')
+  get(@Param('id') id: string) {
+    return this.usersService.findOne(id);
   }
 
-  async getOrdersByUser(userId: string) {
-    const user = await this.findOne(userId);
-    return {
-      date: new Date(),
-      user,
-      // products: this.productsService.findAll(),
-      products: [],
-    };
+  @Get(':id/orders')
+  getOrders(@Param('id') id: string) {
+    return this.usersService.getOrdersByUser(id);
   }
 
-  create(data: CreateUserDto) {
-    const newModel = new this.userModel(data);
-    return newModel.save();
+  @Post()
+  create(@Body() payload: CreateUserDto) {
+    return this.usersService.create(payload);
   }
 
-  update(id: string, changes: UpdateUserDto) {
-    return this.userModel
-      .findByIdAndUpdate(id, { $set: changes }, { new: true })
-      .exec();
+  @Put(':id')
+  update(@Param('id') id: string, @Body() payload: UpdateUserDto) {
+    return this.usersService.update(id, payload);
   }
 
-  remove(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }

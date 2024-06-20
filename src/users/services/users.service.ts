@@ -1,7 +1,7 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Db } from 'mongodb';
-import { Model } from 'mongoose';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Db } from 'mongodb';
 
 import { User } from '../entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
@@ -25,7 +25,9 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    return this.userModel.findById(id);
+    const user = await this.userModel.findById(id);
+    if (!user) throw new NotFoundException(`User #${id} not found`);
+    return user;
   }
 
   async getOrdersByUser(userId: string) {
@@ -44,9 +46,11 @@ export class UsersService {
   }
 
   update(id: string, changes: UpdateUserDto) {
-    return this.userModel
+    const user = this.userModel
       .findByIdAndUpdate(id, { $set: changes }, { new: true })
       .exec();
+    if (!user) throw new NotFoundException(`User #${id} not found`);
+    return user;
   }
 
   remove(id: string) {
