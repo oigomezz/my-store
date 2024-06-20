@@ -4,15 +4,8 @@ import {
   IsUrl,
   IsNotEmpty,
   IsPositive,
-  IsOptional,
-  Min,
-  ValidateIf,
-  ValidateNested,
-  IsMongoId,
 } from 'class-validator';
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-
-import { CreateCategoryDto } from './category.dtos';
+import { PartialType, ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
   @IsString()
@@ -41,32 +34,10 @@ export class CreateProductDto {
   @ApiProperty()
   readonly image: string;
 
+  @IsPositive()
   @IsNotEmpty()
-  @ValidateNested()
   @ApiProperty()
-  readonly category: CreateCategoryDto;
-
-  @IsNotEmpty()
-  @IsMongoId()
-  readonly brand: string;
+  readonly brandId: number;
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
-
-export class FilterProductsDto {
-  @IsOptional()
-  @IsPositive()
-  limit: number;
-
-  @IsOptional()
-  @Min(0)
-  offset: number;
-
-  @IsOptional()
-  @Min(0)
-  minPrice: number;
-
-  @ValidateIf((params) => params.minPrice)
-  @IsPositive()
-  maxPrice: number;
-}

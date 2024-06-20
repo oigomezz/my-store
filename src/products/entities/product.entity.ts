@@ -1,36 +1,53 @@
-import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 import { Brand } from './brand.entity';
+import { Category } from './category.entity';
 
-@Schema()
-export class Product extends Document {
-  @Prop({ required: true })
+@Entity()
+export class Product {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'varchar', length: 255, unique: true })
   name: string;
 
-  @Prop()
+  @Column({ type: 'text' })
   description: string;
 
-  @Prop({ type: Number, index: true })
+  @Column({ type: 'int' })
   price: number;
 
-  @Prop({ type: Number })
+  @Column({ type: 'int' })
   stock: number;
 
-  @Prop()
+  @Column({ type: 'varchar' })
   image: string;
 
-  @Prop(
-    raw({
-      name: { type: String },
-      image: { type: String },
-    }),
-  )
-  category: Record<string, any>;
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createAt: Date;
 
-  @Prop({ type: Types.ObjectId, ref: Brand.name })
-  brand: Brand | Types.ObjectId;
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updateAt: Date;
+
+  @ManyToOne(() => Brand, (brand) => brand.products)
+  brand: Brand;
+
+  @ManyToMany(() => Category, (category) => category.products)
+  @JoinTable()
+  categories: Category[];
 }
-
-export const ProductSchema = SchemaFactory.createForClass(Product);
-ProductSchema.index({ price: 1, stock: -1 });
