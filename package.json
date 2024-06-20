@@ -1,7 +1,7 @@
 {
   "name": "my-store",
   "version": "0.0.1",
-  "description": "",
+  "description": "This is an online shopping store project using Nest.js",
   "author": "oigomezz",
   "private": true,
   "license": "MIT",
