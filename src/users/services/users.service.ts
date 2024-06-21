@@ -1,15 +1,13 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
 import { Client } from 'pg';
 
 import { User } from '../entities/user.entity';
-import { Order } from '../entities/order.entity';
 import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
-
-import { ProductsService } from './../../products/services/products.service';
 import { CustomersService } from './customers.service';
+import { ProductsService } from './../../products/services/products.service';
 
 @Injectable()
 export class UsersService {
@@ -31,10 +29,10 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.userRepo.findOne(id);
-    if (!user) {
-      throw new NotFoundException(`User #${id} not found`);
-    }
+    const user = await this.userRepo.findOne({
+      where: { id },
+    });
+    if (!user) throw new NotFoundException(`User #${id} not found`);
     return user;
   }
 
