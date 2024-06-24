@@ -1,7 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, UseGuards } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { Client } from 'pg';
 
+import { ApiKeyGuard } from './auth/guards/api-key.guard';
 import config from './config';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class AppService {
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
+  @UseGuards(ApiKeyGuard)
   getHello(): string {
     const apiKey = this.configService.apiKey;
     return `Hello World! ${apiKey}`;
