@@ -134,5 +134,6 @@ dist
 # db storage
 /mongo_data/
 /postgres_data/
+/mysql_data/
 
 package-lock.json
