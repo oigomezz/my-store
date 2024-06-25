@@ -19,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
       load: [config],
       isGlobal: true,
       validationSchema: Joi.object({
-        API_KEY: Joi.number().required(),
+        API_KEY: Joi.string().required(),
         POSTGRES_HOST: Joi.string().required(),
         POSTGRES_PORT: Joi.number().required(),
         POSTGRES_DB: Joi.string().required(),
