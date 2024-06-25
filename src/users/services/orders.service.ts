@@ -17,6 +17,14 @@ export class OrdersService {
     return this.orderRepo.find();
   }
 
+  async ordersByCustomer(customerId: number) {
+    const customer = await this.customerRepo.findOne({
+      where: { id: customerId },
+    });
+
+    return this.orderRepo.find({ where: { customer } });
+  }
+
   async findOne(id: number) {
     const order = await this.orderRepo.findOne({
       where: { id },
