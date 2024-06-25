@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Query,
   Param,
   Post,
   Body,
@@ -8,24 +9,25 @@ import {
   Delete,
   HttpStatus,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { ParseIntPipe } from '../../common/parse-int.pipe';
-import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  FilterProductsDto,
+} from '../dtos/products.dtos';
 import { ProductsService } from './../services/products.service';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { Public } from '../../auth/decorators/public.decorator';
 
+@UseGuards(JwtAuthGuard)
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
-
-  @Get()
-  @ApiOperation({ summary: 'List of products' })
-  getProducts() {
-    return this.productsService.findAll();
-  }
-
   /*
   @Get()
   getProducts(
@@ -39,6 +41,14 @@ export class ProductsController {
   }
   */
 
+  @Public()
+  @Get()
+  @ApiOperation({ summary: 'List of products' })
+  getProducts(@Query() params: FilterProductsDto) {
+    return this.productsService.findAll(params);
+  }
+
+  @Public()
   @Get(':productId')
   @HttpCode(HttpStatus.ACCEPTED)
   getOne(@Param('productId', ParseIntPipe) productId: number) {
