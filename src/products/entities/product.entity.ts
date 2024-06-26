@@ -9,35 +9,24 @@ export class Product extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Column({ type: 'text' })
+  @Prop()
   description: string;
 
-  @Index()
-  @Column({ type: 'int' })
+  @Prop({ type: Number, index: true })
   price: number;
 
-  @Column({ type: 'int' })
+  @Prop({ type: Number })
   stock: number;
 
-  @Column({ type: 'varchar' })
+  @Prop()
   image: string;
 
   @Prop({ type: Types.ObjectId, ref: Category.name })
   category: Category | Types.ObjectId;
 
-  @ManyToOne(() => Brand, (brand) => brand.products)
-  @JoinColumn({ name: 'brand_id' })
-  brand: Brand;
-
-  @ManyToMany(() => Category, (category) => category.products)
-  @JoinTable({
-    name: 'products_categories',
-    joinColumn: {
-      name: 'product_id',
-    },
-    inverseJoinColumn: {
-      name: 'category_id',
-    },
-  })
-  categories: Category[];
+  @Prop({ type: Types.ObjectId, ref: Brand.name })
+  brand: Brand | Types.ObjectId;
 }
+
+export const ProductSchema = SchemaFactory.createForClass(Product);
+ProductSchema.index({ price: 1, stock: -1 });

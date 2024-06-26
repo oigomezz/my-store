@@ -1,26 +1,25 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Client } from 'pg';
+import { MongooseModule } from '@nestjs/mongoose';
+import { MongoClient } from 'mongodb';
 
 import config from 'src/config';
 
 @Global()
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      inject: [config.KEY],
+    MongooseModule.forRootAsync({
       useFactory: (configService: ConfigType<typeof config>) => {
+        const { connection, user, password, host, port, dbName } =
+          configService.mongo;
         return {
-          type: 'postgres',
-          url: configService.postgresUrl,
-          synchronize: false,
-          autoLoadEntities: true,
-          ssl: {
-            rejectUnauthorized: false,
-          },
+          uri: `${connection}://${host}:${port}`,
+          user,
+          pass: password,
+          dbName,
         };
       },
+      inject: [config.KEY],
     }),
   ],
   providers: [
@@ -32,22 +31,19 @@ import config from 'src/config';
           : process.env.API_KEY,
     },
     {
-      provide: 'PG',
-      useFactory: (configService: ConfigType<typeof config>) => {
-        const { user, host, database, password, port } = configService.postgres;
-        const client = new Client({
-          user,
-          host,
-          database,
-          password,
-          port,
-        });
-        client.connect();
-        return client;
+      provide: 'MONGO',
+      useFactory: async (configService: ConfigType<typeof config>) => {
+        const { connection, user, password, host, port, dbName } =
+          configService.mongo;
+        const uri = `${connection}://${user}:${password}@${host}:${port}/?authSource=admin&readPreference=primary`;
+        const client = new MongoClient(uri);
+        await client.connect();
+        const database = client.db(dbName);
+        return database;
       },
       inject: [config.KEY],
     },
   ],
-  exports: ['API_KEY', 'PG', TypeOrmModule],
+  exports: ['API_KEY', 'MONGO', MongooseModule],
 })
 export class DatabaseModule {}

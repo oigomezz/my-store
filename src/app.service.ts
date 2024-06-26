@@ -1,13 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { Client } from 'pg';
+import { Db } from 'mongodb';
 
 import config from './config';
 
 @Injectable()
 export class AppService {
   constructor(
-    @Inject('PG') private database: Client,
+    @Inject('MONGO') private database: Db,
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
@@ -17,11 +17,7 @@ export class AppService {
   }
 
   getTasks() {
-    return new Promise((resolve, reject) => {
-      this.database.query('SELECT * FROM tasks', (err, res) => {
-        if (err) reject(err);
-        resolve(res.rows);
-      });
-    });
+    const tasksCollection = this.database.collection('tasks');
+    return tasksCollection.find().toArray();
   }
 }

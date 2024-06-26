@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 import { Customer } from '../entities/customer.entity';
 import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dto';
@@ -8,33 +8,34 @@ import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dto';
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectRepository(Customer) private customerRepo: Repository<Customer>,
+    @InjectModel(Customer.name) private customerModel: Model<Customer>,
   ) {}
 
   findAll() {
-    return this.customerRepo.find();
+    return this.customerModel.find().exec();
   }
 
-  async findOne(id: number) {
-    const customer = await this.customerRepo.findOne({
-      where: { id },
-    });
+  async findOne(id: string) {
+    const customer = await this.customerModel.findById(id);
+    if (!customer) throw new NotFoundException(`Customer #${id} not found`);
+    return this.customerModel.findById(id);
+  }
+
+  create(data: CreateCustomerDto) {
+    console.log(data);
+    const newModel = new this.customerModel(data);
+    return newModel.save();
+  }
+
+  update(id: string, changes: UpdateCustomerDto) {
+    const customer = this.customerModel
+      .findByIdAndUpdate(id, { $set: changes }, { new: true })
+      .exec();
     if (!customer) throw new NotFoundException(`Customer #${id} not found`);
     return customer;
   }
 
-  create(data: CreateCustomerDto) {
-    const newCustomer = this.customerRepo.create(data);
-    return this.customerRepo.save(newCustomer);
-  }
-
-  async update(id: number, changes: UpdateCustomerDto) {
-    const customer = await this.findOne(id);
-    this.customerRepo.merge(customer, changes);
-    return this.customerRepo.save(customer);
-  }
-
-  remove(id: number) {
-    return this.customerRepo.delete(id);
+  remove(id: string) {
+    return this.customerModel.findByIdAndDelete(id);
   }
 }

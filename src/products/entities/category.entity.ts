@@ -1,34 +1,13 @@
-import {
-  PrimaryGeneratedColumn,
-  Entity,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToMany,
-} from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-import { Product } from './product.entity';
-
-@Entity()
-export class Category {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'varchar', length: 255, unique: true })
+@Schema()
+export class Category extends Document {
+  @Prop({ required: true, unique: true })
   name: string;
 
-  @CreateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createAt: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  updateAt: Date;
-
-  @ManyToMany(() => Product, (product) => product.categories)
-  products: Product[];
+  @Prop()
+  image: string;
 }
+
+export const CategorySchema = SchemaFactory.createForClass(Category);

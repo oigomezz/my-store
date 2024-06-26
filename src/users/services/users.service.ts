@@ -5,9 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from '../entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
-
-import { CustomersService } from './customers.service';
-import { ProductsService } from './../../products/services/products.service';
+import { ProductsService } from '../../products/services/products.service';
 
 @Injectable()
 export class UsersService {
@@ -20,10 +18,8 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  async findOne(id: number) {
-    const user = await this.userRepo.findOne({
-      where: { id },
-    });
+  async findOne(id: string) {
+    const user = await this.userModel.findById(id);
     if (!user) throw new NotFoundException(`User #${id} not found`);
     return user;
   }
@@ -37,7 +33,8 @@ export class UsersService {
     return {
       date: new Date(),
       user,
-      products: await this.productsService.findAll(),
+      // products: this.productsService.findAll(),
+      products: [],
     };
   }
 

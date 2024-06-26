@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 import { Category } from '../entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos/category.dtos';
@@ -8,35 +8,33 @@ import { CreateCategoryDto, UpdateCategoryDto } from '../dtos/category.dtos';
 @Injectable()
 export class CategoriesService {
   constructor(
-    @InjectRepository(Category) private categoryRepo: Repository<Category>,
+    @InjectModel(Category.name) private categoryModel: Model<Category>,
   ) {}
 
   findAll() {
-    return this.categoryRepo.find();
+    return this.categoryModel.find().exec();
   }
 
-  async findOne(id: number) {
-    const category = this.categoryRepo.findOne({
-      where: { id },
-      relations: ['products'],
-    });
+  async findOne(id: string) {
+    const category = await this.categoryModel.findOne({ _id: id }).exec();
     if (!category) throw new NotFoundException(`Category #${id} not found`);
-
     return category;
   }
 
   create(data: CreateCategoryDto) {
-    const newCategory = this.categoryRepo.create(data);
-    return this.categoryRepo.save(newCategory);
+    const newCategory = new this.categoryModel(data);
+    return newCategory.save();
   }
 
-  async update(id: number, changes: UpdateCategoryDto) {
-    const category = await this.findOne(id);
-    this.categoryRepo.merge(category, changes);
-    return this.categoryRepo.save(category);
+  async update(id: string, changes: UpdateCategoryDto) {
+    const category = await this.categoryModel
+      .findByIdAndUpdate(id, { $set: changes }, { new: true })
+      .exec();
+    if (!category) throw new NotFoundException(`Category #${id} not found`);
+    return category;
   }
 
-  remove(id: number) {
-    return this.categoryRepo.delete(id);
+  remove(id: string) {
+    return this.categoryModel.findByIdAndDelete(id);
   }
 }
