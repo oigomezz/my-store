@@ -30,9 +30,8 @@ export class OrdersService {
       where: { id },
       relations: ['items', 'items.product'],
     });
-    if (!order) {
-      throw new NotFoundException('not found');
-    }
+    if (!order) throw new NotFoundException('not found');
+
     return order;
   }
 
