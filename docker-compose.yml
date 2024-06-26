@@ -1,6 +1,48 @@
 version: '3.3'
 
 services:
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=store
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=123456
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=root@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - '5050:80'
+    depends_on:
+      - postgres
+
+  mysql:
+    image: mysql:5
+    environment:
+      - MYSQL_DATABASE=store
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=123456
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - PMA_HOST=mysql
+    ports:
+      - '8080:80'
+    depends_on:
+      - mysql
+
   mongo:
     image: mongo:4.4
     environment:
@@ -9,4 +51,4 @@ services:
     ports:
       - 27017:27017
     volumes:
-     - ./mongo_data:/data/db
+      - ./mongo_data:/data/db

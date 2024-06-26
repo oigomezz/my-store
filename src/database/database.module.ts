@@ -3,7 +3,7 @@ import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongoClient } from 'mongodb';
 
-import config from '../config';
+import config from 'src/config';
 
 @Global()
 @Module({
