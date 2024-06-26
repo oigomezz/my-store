@@ -12,10 +12,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { Public } from '../../auth/decorators/public.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/models/roles.model';
 
-import { MongoIdPipe } from './../../common/mongo-id.pipe';
+import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -23,7 +26,7 @@ import {
 } from '../dtos/products.dtos';
 import { ProductsService } from './../services/products.service';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
@@ -43,6 +46,7 @@ export class ProductsController {
     return this.productsService.findOne(productId);
   }
 
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() payload: CreateProductDto) {
     return this.productsService.create(payload);
@@ -53,6 +57,7 @@ export class ProductsController {
     return this.productsService.update(id, payload);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.productsService.remove(id);
