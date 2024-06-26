@@ -19,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
       load: [config],
       isGlobal: true,
       validationSchema: Joi.object({
-        API_KEY: Joi.number().required(),
+        API_KEY: Joi.string().required(),
         MONGO_HOST: Joi.string().required(),
         MONGO_PORT: Joi.number().required(),
         MONGO_DB: Joi.string().required(),
