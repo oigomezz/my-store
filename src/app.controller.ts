@@ -14,11 +14,6 @@ export class AppController {
   }
 
   @Public()
-  @Get('new')
-  newEndpoint() {
-    return 'Soy un nuevo endpoint';
-  }
-
   @Get('/tasks/')
   getTasks() {
     return this.appService.getTasks();

@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 import { User } from '../entities/user.entity';
@@ -14,18 +13,11 @@ import { ProductsService } from './../../products/services/products.service';
 export class UsersService {
   constructor(
     private productsService: ProductsService,
-    private configService: ConfigService,
-    @InjectRepository(User) private userRepo: Repository<User>,
-    private customersService: CustomersService,
+    @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   findAll() {
-    const apiKey = this.configService.get('API_KEY');
-    const dbName = this.configService.get('DATABASE_NAME');
-    console.log(apiKey, dbName);
-    return this.userRepo.find({
-      relations: ['customer'],
-    });
+    return this.userModel.find().exec();
   }
 
   async findOne(id: number) {
@@ -37,36 +29,36 @@ export class UsersService {
   }
 
   findByEmail(email: string) {
-    return this.userRepo.findOne({ where: { email } });
+    return this.userModel.findOne({ email }).exec();
   }
 
-  async create(data: CreateUserDto) {
-    const newUser = this.userRepo.create(data);
-    const hashPassword = await bcrypt.hash(newUser.password, 10);
-    newUser.password = hashPassword;
-    if (data.customerId) {
-      const customer = await this.customersService.findOne(data.customerId);
-      newUser.customer = customer;
-    }
-    return this.userRepo.save(newUser);
-  }
-
-  async update(id: number, changes: UpdateUserDto) {
-    const user = await this.findOne(id);
-    this.userRepo.merge(user, changes);
-    return this.userRepo.save(user);
-  }
-
-  remove(id: number) {
-    return this.userRepo.delete(id);
-  }
-
-  async getOrderByUser(id: number) {
-    const user = this.findOne(id);
+  async getOrdersByUser(userId: string) {
+    const user = await this.findOne(userId);
     return {
       date: new Date(),
       user,
       products: await this.productsService.findAll(),
     };
+  }
+
+  async create(data: CreateUserDto) {
+    const newModel = new this.userModel(data);
+    const hashPassword = await bcrypt.hash(newModel.password, 10);
+    newModel.password = hashPassword;
+    const model = await newModel.save();
+    delete model.password;
+    return model;
+  }
+
+  update(id: string, changes: UpdateUserDto) {
+    const user = this.userModel
+      .findByIdAndUpdate(id, { $set: changes }, { new: true })
+      .exec();
+    if (!user) throw new NotFoundException(`User #${id} not found`);
+    return user;
+  }
+
+  remove(id: string) {
+    return this.userModel.findByIdAndDelete(id);
   }
 }

@@ -12,8 +12,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/models/roles.model';
 
-import { ParseIntPipe } from 'src/common/parse-int.pipe';
+import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -67,14 +72,6 @@ export class ProductsController {
   @Put(':id')
   update(@Param('id') id: number, @Body() payload: UpdateProductDto) {
     return this.productsService.update(id, payload);
-  }
-
-  @Put(':id/category/:categoryId')
-  addCategoryToProduct(
-    @Param('id') id: number,
-    @Param('categoryId', ParseIntPipe) categoryId: number,
-  ) {
-    return this.productsService.addCategoryToProduct(id, categoryId);
   }
 
   @Roles(Role.ADMIN)

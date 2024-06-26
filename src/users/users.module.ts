@@ -14,7 +14,7 @@ import { OrderItemController } from './controllers/order-item.controller';
 import { OrderItemService } from './services/order-item.service';
 import { OrderItem } from './entities/order-item.entity';
 
-import { ProductsModule } from '../products/products.module';
+import { ProductsModule } from './../products/products.module';
 import { ProfileController } from './controllers/profile.controller';
 
 @Module({
@@ -26,10 +26,9 @@ import { ProfileController } from './controllers/profile.controller';
     CustomerController,
     UsersController,
     OrdersController,
-    OrderItemController,
     ProfileController,
   ],
-  providers: [CustomersService, UsersService, OrdersService, OrderItemService],
+  providers: [CustomersService, UsersService, OrdersService],
   exports: [UsersService],
 })
 export class UsersModule {}

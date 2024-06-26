@@ -23,7 +23,7 @@ export class RolesGuard implements CanActivate {
     // ['admin', 'customer'];
     const request = context.switchToHttp().getRequest();
     const user = request.user as PayloadToken;
-    // { role: 'admin', sub: 1234 }
+    // { role: 'admin', sub: 1212 }
     const isAuth = roles.some((role) => role === user.role);
     if (!isAuth) throw new UnauthorizedException('your role is wrong');
 

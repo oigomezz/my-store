@@ -2,27 +2,42 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Order } from './../entities/order.entity';
-import { Customer } from './../entities/customer.entity';
-import { CreateOrderDto, UpdateOrderDto } from './../dtos/order.dto';
+import { Customer } from '../entities/customer.entity';
+import { Order } from '../entities/order.entity';
+import { CreateOrderDto, UpdateOrderDto } from '../dtos/order.dto';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(Order) private orderRepo: Repository<Order>,
-    @InjectRepository(Customer) private customerRepo: Repository<Customer>,
+    @InjectModel(Customer.name) private customerModel: Model<Customer>,
+    @InjectModel(Order.name) private orderModel: Model<Order>,
   ) {}
 
   findAll() {
-    return this.orderRepo.find();
+    return this.orderModel
+      .find()
+      .populate('customer')
+      .populate('products')
+      .exec();
   }
 
   async ordersByCustomer(customerId: number) {
-    const customer = await this.customerRepo.findOne({
+    const customer = await this.customerModel.findOne({
       where: { id: customerId },
     });
 
-    return this.orderRepo.find({ where: { customer } });
+    return this.orderModel.find({ where: { customer } });
+  }
+
+  async findOne(id: string) {
+    const order = await this.orderModel.findById(id);
+    if (!order) throw new NotFoundException(`Order #${id} not found`);
+    return order;
+  }
+
+  create(data: CreateOrderDto) {
+    const newModel = new this.orderModel(data);
+    return newModel.save();
   }
 
   async findOne(id: number) {

@@ -21,22 +21,24 @@ export class ProductsService {
 
   findAll(params?: FilterProductsDto) {
     if (params) {
-      const where: FindOptionsWhere<Product> = {};
-      const { limit, offset } = params;
-      const { maxPrice, minPrice } = params;
-      if (minPrice && maxPrice) {
-        where.price = Between(minPrice, maxPrice);
-      }
-      return this.productRepo.find({
-        relations: ['brand'],
-        where,
-        take: limit,
-        skip: offset,
-      });
+      const filters: FilterQuery<Product> = {};
+      const { limit, offset, minPrice, maxPrice } = params;
+      if (minPrice && maxPrice)
+        filters.price = { $gte: minPrice, $lte: maxPrice };
+
+      return this.productModel
+        .find(filters)
+        .populate('brand')
+        .populate('category')
+        .skip(offset)
+        .limit(limit)
+        .exec();
     }
-    return this.productRepo.find({
-      relations: ['brand'],
-    });
+    return this.productModel
+      .find()
+      .populate('brand')
+      .populate('category')
+      .exec();
   }
 
   async findOne(id: number) {
