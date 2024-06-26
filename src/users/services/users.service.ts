@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from '../entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
+
 import { CustomersService } from './customers.service';
 import { ProductsService } from './../../products/services/products.service';
 

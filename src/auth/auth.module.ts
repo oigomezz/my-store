@@ -7,7 +7,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './controllers/auth.controller';
 import { UsersModule } from './../users/users.module';
-import config from './../config';
+import config from 'src/config';
 
 @Module({
   imports: [

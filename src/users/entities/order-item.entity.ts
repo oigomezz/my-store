@@ -6,7 +6,6 @@ import {
   Column,
   ManyToOne,
 } from 'typeorm';
-
 import { Exclude } from 'class-transformer';
 
 import { Product } from '../../products/entities/product.entity';

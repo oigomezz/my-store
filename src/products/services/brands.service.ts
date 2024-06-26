@@ -18,9 +18,8 @@ export class BrandsService {
       where: { id },
       relations: ['products'],
     });
-    if (!product) {
-      throw new NotFoundException(`Brand #${id} not found`);
-    }
+    if (!product) throw new NotFoundException(`Brand #${id} not found`);
+
     return product;
   }
 

@@ -20,9 +20,8 @@ export class CategoriesService {
       where: { id },
       relations: ['products'],
     });
-    if (!category) {
-      throw new NotFoundException(`Category #${id} not found`);
-    }
+    if (!category) throw new NotFoundException(`Category #${id} not found`);
+
     return category;
   }
 

@@ -7,7 +7,6 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-
 import { Exclude } from 'class-transformer';
 
 import { Customer } from './customer.entity';
