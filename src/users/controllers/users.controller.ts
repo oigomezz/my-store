@@ -25,11 +25,6 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get('tasks')
-  tasks() {
-    return this.usersService.getTasks();
-  }
-
   @Get(':id')
   get(@Param('id') id: string) {
     return this.usersService.findOne(id);

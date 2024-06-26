@@ -15,6 +15,8 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors();
+
   const config = new DocumentBuilder()
     .setTitle('API')
     .setDescription('MY STORE')
@@ -22,8 +24,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-
-  app.enableCors();
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

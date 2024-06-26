@@ -31,11 +31,6 @@ export class ProductsController {
     return this.productsService.findAll(params);
   }
 
-  @Get('filter')
-  getProductFilter() {
-    return `yo soy un filter`;
-  }
-
   @Get(':productId')
   @HttpCode(HttpStatus.ACCEPTED)
   getOne(@Param('productId', MongoIdPipe) productId: string) {

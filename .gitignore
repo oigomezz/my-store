@@ -131,7 +131,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# mongo db storage
+# db storage
 /mongo_data/
+/postgres_data/
+/mysql_data/
 
 package-lock.json

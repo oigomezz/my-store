@@ -1,7 +1,6 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Db } from 'mongodb';
 
 import { User } from '../entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
@@ -11,17 +10,11 @@ import { ProductsService } from '../../products/services/products.service';
 export class UsersService {
   constructor(
     private productsService: ProductsService,
-    @Inject('MONGO') private databaseMongo: Db,
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   findAll() {
     return this.userModel.find().exec();
-  }
-
-  getTasks() {
-    const tasksCollection = this.databaseMongo.collection('tasks');
-    return tasksCollection.find().toArray();
   }
 
   async findOne(id: string) {

@@ -1,7 +1,8 @@
-import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Brand } from './brand.entity';
+import { Category } from './category.entity';
 
 @Schema()
 export class Product extends Document {
@@ -20,13 +21,8 @@ export class Product extends Document {
   @Prop()
   image: string;
 
-  @Prop(
-    raw({
-      name: { type: String },
-      image: { type: String },
-    }),
-  )
-  category: Record<string, any>;
+  @Prop({ type: Types.ObjectId, ref: Category.name })
+  category: Category | Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: Brand.name })
   brand: Brand | Types.ObjectId;
